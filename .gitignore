@@ -1,2 +1,3 @@
-scripts/names.txt
-repos/*
+/scripts/names.txt
+/repos/*
+!/repos/repos-readme.txt
