@@ -9,8 +9,8 @@ do
 	gitHandle="${gitHandle##*( )}"
 	gitHandle="${gitHandle%%*( )}"
 
-	# Ignore comments
-	if [[ ${gitHandle:0:1} == '#' ]]
+	# ignore empty lines or comments
+	if [ -z "$gitHandle" ] || [[ ${gitHandle:0:1} == '#' ]]
 	then
 		continue
 	fi
