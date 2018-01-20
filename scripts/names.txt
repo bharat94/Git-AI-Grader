@@ -1,0 +1,5 @@
+# This file is used to store the list of git user names of the students to interact with their git repos
+# you could start a line with '#' to write a comment
+# anything without a '#' will be parsed as a git handle
+username1
+username2
