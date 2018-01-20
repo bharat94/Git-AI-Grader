@@ -31,8 +31,11 @@ do
 
 	# Format of remote repo : https://github.ccs.neu.edu/{gitHandle}/CS4100.git
 	# Output folder : repos/gitHandle-CS4100/
-
-	git clone "https://github.ccs.neu.edu/$gitHandle/CS4100.git" "../repos/$gitHandle-CS4100"
-
-	echo "$gitHandle"
+	if [ ! -d "../repos/$gitHandle-CS4100" ]
+	then
+		git clone "https://github.ccs.neu.edu/$gitHandle/CS4100.git" "../repos/$gitHandle-CS4100"
+		echo "cloned repo for $gitHandle"
+	else
+		echo "repo already exists"
+	fi
 done < "$file"
