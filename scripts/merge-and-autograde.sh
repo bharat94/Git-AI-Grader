@@ -69,11 +69,17 @@ echo "done unzipping"
 PresentDir="$(pwd)"
 echo "stored dir : ${PresentDir}"
 
+# timestamp function
+timestamp() {
+	date "+%Y%m%d_%H%M%S"
+}
+
 # create a report file
 reportsFile="../reports/pa${pa_number}-results.txt"
 touch "${reportsFile}"
 echo "Created pa${pa_number}-results.txt in reports"
-echo "${reportsFile}"
+
+printf "\nResults for $(timestamp)\n" >> "${reportsFile}"
 
 # text file to parse git handles one by one
 namesfile="names.txt"
