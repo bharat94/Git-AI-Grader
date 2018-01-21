@@ -25,7 +25,7 @@ fi
 pa_number=$1
 echo "PA number : $pa_number"
 
-sub_files=$(cat "$file" | grep "$pa_number")
+sub_files=$(cat "$file" | grep "pa${pa_number} :")
 
 IFS=$','
 sub_files_arr=($(cut -d ":" -f 2 <<< "$sub_files"))
@@ -80,6 +80,7 @@ namesfile="names.txt"
 
 while IFS= read -r gitHandle || [[ -n "$gitHandle" ]]
 do
+	cd "${PresentDir}"
 	# trimming leading and trailing white spaces
 	gitHandle="${gitHandle##*( )}"
 	gitHandle="${gitHandle%%*( )}"
@@ -102,6 +103,9 @@ do
 		if [ -e "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" ]
 		then
 			yes | cp -rf "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" "tmp/${zipName}/"
+		elif [ -e "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" ]
+		then
+			yes | cp -rf "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" "tmp/${zipName}/"
 		else
 			echo "${fileName} does not exist for ${gitHandle}"
 		fi
@@ -110,8 +114,22 @@ do
 	# jump and autograde
 	cd "tmp/${zipName}/"
 	echo "running grader for : ${gitHandle}"
-	result=$(python "autograder.py" | grep "Total: ")
-	score=$(trim $(cut -d ":" -f 2 <<< "$result"))
+
+	#default score (when error)
+	score="N/A"
+
+	result=$(python "autograder.py" 2>/dev/null | grep "Total: ")
+
+	if [ ! -z "$result" ]
+	then
+		score=$(trim $(cut -d ":" -f 2 <<< "$result"))
+	else
+		# Note: sleeping for some seconds here because autograder 
+		# chews up a thread when in error -_-
+		echo "sleeping 2 secs..."
+		sleep 2
+	fi
+
 	# jump back
 	cd "${PresentDir}"
 	echo "${gitHandle}  : ${score}" >> "${reportsFile}"
