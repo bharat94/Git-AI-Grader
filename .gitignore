@@ -2,3 +2,5 @@
 /repos/*
 !/repos/repos-readme.txt
 scripts/tmp/
+/reports/*
+!/reports/reports-readme.txt

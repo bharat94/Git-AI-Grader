@@ -47,18 +47,80 @@ then
 fi
 for ((i=0; i<${#sub_files_arr[@]}; ++i)); do     echo "${sub_files_arr[$i]}"; done
 
-# clean up temp/ if exists else create
+# clean up tmp/ if exists else create
 if [ -d  "tmp/" ]
 then
 	echo "tmp folder exists so cleaning it"
-	rm -rf "tmp/*"
-else
-	echo "creating tmp folder"
-	mkdir "tmp"
+	rm -rf "./tmp/"
 fi
-# unzip correct zip to temp
 
-# repeat for each student
-# copy student files to temp, autograde, and publish to report
+mkdir "tmp"
+
+# unzip correct zip to temp
+declare -a zips=( "search" "multiagent" "reinforcement" "tracking" "classification" )
+
+zipName="${zips[$pa_number-1]}"
+
+echo "unzipping ..."
+unzip "../zips/${zipName}.zip" -d "tmp/" &> /dev/null
+echo "done unzipping"
+
+# Storing the pwd for future jumps
+PresentDir="$(pwd)"
+echo "stored dir : ${PresentDir}"
+
+# create a report file
+reportsFile="../reports/pa${pa_number}-results.txt"
+touch "${reportsFile}"
+echo "Created pa${pa_number}-results.txt in reports"
+echo "${reportsFile}"
+
+# text file to parse git handles one by one
+namesfile="names.txt"
+
+while IFS= read -r gitHandle || [[ -n "$gitHandle" ]]
+do
+	# trimming leading and trailing white spaces
+	gitHandle="${gitHandle##*( )}"
+	gitHandle="${gitHandle%%*( )}"
+
+	# ignore empty lines or comments
+	if [ -z "$gitHandle" ] || [[ ${gitHandle:0:1} == '#' ]]
+	then
+		continue
+	fi
+
+	echo "Grading student : ${gitHandle}"
+
+	# repeat for each student (gitHandle)
+	# copy student files to temp, autograde, and publish to report
+
+	for ((i=0; i<${#sub_files_arr[@]}; ++i))
+	do
+		fileName=${sub_files_arr[$i]}
+		echo "copying ${fileName} of ${gitHandle} to tmp"
+		if [ -e "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" ]
+		then
+			yes | cp -rf "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" "tmp/${zipName}/"
+		else
+			echo "${fileName} does not exist for ${gitHandle}"
+		fi
+	done
+
+	# jump and autograde
+	cd "tmp/${zipName}/"
+	echo "running grader for : ${gitHandle}"
+	result=$(python "autograder.py" | grep "Total: ")
+	score=$(trim $(cut -d ":" -f 2 <<< "$result"))
+	# jump back
+	cd "${PresentDir}"
+	echo "${gitHandle}  : ${score}" >> "${reportsFile}"
+	
+done < "$namesfile"
+
+
+
+
+
 
 
