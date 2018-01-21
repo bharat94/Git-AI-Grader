@@ -47,4 +47,18 @@ then
 fi
 for ((i=0; i<${#sub_files_arr[@]}; ++i)); do     echo "${sub_files_arr[$i]}"; done
 
+# clean up temp/ if exists else create
+if [ -d  "tmp/" ]
+then
+	echo "tmp folder exists so cleaning it"
+	rm -rf "tmp/*"
+else
+	echo "creating tmp folder"
+	mkdir "tmp"
+fi
+# unzip correct zip to temp
+
+# repeat for each student
+# copy student files to temp, autograde, and publish to report
+
 
