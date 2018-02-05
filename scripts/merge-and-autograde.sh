@@ -2,7 +2,8 @@
 
 # usage
 display_usage() {
-	echo -e "\nUsage:\n$0 <PA_number> \n" 
+	echo -e "\nUsage:\n$0 <PA_number> \n"
+	exit 2
 }
 
 
