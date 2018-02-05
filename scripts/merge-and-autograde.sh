@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # usage
-display_usage() {
-	echo -e "\nUsage:\n$0 <PA_number> \n" 
+display_usage_and_exit() {
+	echo -e "\nUsage:\n$0 <PA_number> \n"
+	exit 2
 }
 
 
@@ -12,13 +13,13 @@ file="question-file-mappings.txt"
 if [ "$#" -ne 1 ]
 then
     echo "Illegal number of parameters"
-    display_usage
+    display_usage_and_exit
 fi
 
 if [ "$1" -lt 1  ] || [ "$1" -gt 5  ]
 then
     echo "PA assignment number should be between 1 and 5"
-    display_usage
+    display_usage_and_exit
 fi
 
 # the programming assignment number
