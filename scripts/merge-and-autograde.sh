@@ -82,8 +82,35 @@ echo "Created pa${pa_number}-results.txt in reports"
 
 printf "\nResults for $(timestamp)\n" >> "${reportsFile}"
 
+run_grader_and_generate_report(){
+		# jump and autograde
+		cd "tmp/${zipName}/"
+		echo "running grader for : ${gitHandle}"
+
+		#default score (when error)
+		score="N/A"
+
+		result=$(python "autograder.py" 2>/dev/null | grep "Total: ")
+
+		if [ ! -z "$result" ]
+		then
+			score=$(trim $(cut -d ":" -f 2 <<< "$result"))
+		else
+			# Note: sleeping for some seconds here because autograder 
+			# chews up a thread when in error -_-
+			echo "sleeping 2 secs..."
+			sleep 2
+		fi
+
+		# jump back
+		cd "${PresentDir}"
+		echo "${gitHandle}  : ${score}" >> "${reportsFile}"
+	}
+
+
 # text file to parse git handles one by one
 namesfile="names.txt"
+
 
 while IFS= read -r gitHandle || [[ -n "$gitHandle" ]]
 do
@@ -110,37 +137,16 @@ do
 		if [ -e "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" ]
 		then
 			yes | cp -rf "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" "tmp/${zipName}/"
+			run_grader_and_generate_report
 		elif [ -e "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" ]
 		then
 			yes | cp -rf "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" "tmp/${zipName}/"
+			run_grader_and_generate_report		
 		else
 			echo "${fileName} does not exist for ${gitHandle}"
 		fi
 	done
 
-	# jump and autograde
-	cd "tmp/${zipName}/"
-	echo "running grader for : ${gitHandle}"
-
-	#default score (when error)
-	score="N/A"
-
-	result=$(python "autograder.py" 2>/dev/null | grep "Total: ")
-
-	if [ ! -z "$result" ]
-	then
-		score=$(trim $(cut -d ":" -f 2 <<< "$result"))
-	else
-		# Note: sleeping for some seconds here because autograder 
-		# chews up a thread when in error -_-
-		echo "sleeping 2 secs..."
-		sleep 2
-	fi
-
-	# jump back
-	cd "${PresentDir}"
-	echo "${gitHandle}  : ${score}" >> "${reportsFile}"
-	
 done < "$namesfile"
 
 
