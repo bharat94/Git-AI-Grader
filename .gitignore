@@ -1,4 +1,5 @@
 /scripts/names.txt
+/scripts/names*
 /repos/*
 !/repos/repos-readme.txt
 scripts/tmp/

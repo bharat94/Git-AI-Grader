@@ -114,6 +114,7 @@ do
 			yes | cp -rf "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" "tmp/${zipName}/"
 		else
 			echo "${fileName} does not exist for ${gitHandle}"
+			echo "${gitHandle}  : NoFile" >> "${reportsFile}"
 		fi
 	done
 
