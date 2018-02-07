@@ -149,9 +149,6 @@ do
 	if [ "$number_of_sub_files_copied" == "${#sub_files_arr[subscript]}" ]
 	then
 		run_grader_and_generate_report
-		echo "hey"
-	else 
-		echo "no hey"
 	fi
 
 done < "$namesfile"
