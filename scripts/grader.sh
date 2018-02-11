@@ -94,7 +94,7 @@ run_grader_and_generate_report(){
 		#default score (when error)
 		score="N/A"
 
-		result=$(python "autograder.py" 2>/dev/null | grep "Total: ")
+		result=$(python -m compileall . &>/dev/null; python "autograder.py" 2>/dev/null | grep "Total: ")
 
 		if [ ! -z "$result" ]
 		then
