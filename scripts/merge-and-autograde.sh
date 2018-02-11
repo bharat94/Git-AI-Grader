@@ -111,7 +111,9 @@ run_grader_and_generate_report(){
 # text file to parse git handles one by one
 namesfile="names.txt"
 
+declare -i number_of_sub_files_copied
 number_of_sub_files_copied=0
+
 while IFS= read -r gitHandle || [[ -n "$gitHandle" ]]
 do
 	cd "${PresentDir}"
@@ -137,17 +139,17 @@ do
 		if [ -e "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" ]
 		then
 			yes | cp -rf "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" "tmp/${zipName}/"
-			number_of_sub_files_copied++	
+			((number_of_sub_files_copied++))	
 		elif [ -e "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" ]
 		then
 			yes | cp -rf "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" "tmp/${zipName}/"
-			number_of_sub_files_copied++
+			((number_of_sub_files_copied++))
 		else
 			echo "${fileName} does not exist for ${gitHandle}"
 			echo "${gitHandle}  : NoFile" >> "${reportsFile}"
 		fi
 	done
-	if [ "$number_of_sub_files_copied" == "${#sub_files_arr[subscript]}" ]
+	if [ "${number_of_sub_files_copied}" -eq "${#sub_files_arr[@]}" ]
 	then
 		run_grader_and_generate_report
 	fi
