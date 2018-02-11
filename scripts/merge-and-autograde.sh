@@ -82,9 +82,36 @@ echo "Created pa${pa_number}-results.txt in reports"
 
 printf "\nResults for $(timestamp)\n" >> "${reportsFile}"
 
+run_grader_and_generate_report(){
+		# jump and autograde
+		cd "tmp/${zipName}/"
+		echo "running grader for : ${gitHandle}"
+
+		#default score (when error)
+		score="N/A"
+
+		result=$(python "autograder.py" 2>/dev/null | grep "Total: ")
+
+		if [ ! -z "$result" ]
+		then
+			score=$(trim $(cut -d ":" -f 2 <<< "$result"))
+		else
+			# Note: sleeping for some seconds here because autograder 
+			# chews up a thread when in error -_-
+			echo "sleeping 2 secs..."
+			sleep 2
+		fi
+
+		# jump back
+		cd "${PresentDir}"
+		echo "${gitHandle}  : ${score}" >> "${reportsFile}"
+	}
+
+
 # text file to parse git handles one by one
 namesfile="names.txt"
 
+number_of_sub_files_copied=0
 while IFS= read -r gitHandle || [[ -n "$gitHandle" ]]
 do
 	cd "${PresentDir}"
@@ -110,38 +137,21 @@ do
 		if [ -e "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" ]
 		then
 			yes | cp -rf "../repos/$gitHandle-CS4100/PA${pa_number}/${fileName}" "tmp/${zipName}/"
+			number_of_sub_files_copied++	
 		elif [ -e "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" ]
 		then
 			yes | cp -rf "../repos/$gitHandle-CS4100/pa${pa_number}/${fileName}" "tmp/${zipName}/"
+			number_of_sub_files_copied++
 		else
 			echo "${fileName} does not exist for ${gitHandle}"
 			echo "${gitHandle}  : NoFile" >> "${reportsFile}"
 		fi
 	done
-
-	# jump and autograde
-	cd "tmp/${zipName}/"
-	echo "running grader for : ${gitHandle}"
-
-	#default score (when error)
-	score="N/A"
-
-	result=$(python "autograder.py" 2>/dev/null | grep "Total: ")
-
-	if [ ! -z "$result" ]
+	if [ "$number_of_sub_files_copied" == "${#sub_files_arr[subscript]}" ]
 	then
-		score=$(trim $(cut -d ":" -f 2 <<< "$result"))
-	else
-		# Note: sleeping for some seconds here because autograder 
-		# chews up a thread when in error -_-
-		echo "sleeping 2 secs..."
-		sleep 2
+		run_grader_and_generate_report
 	fi
 
-	# jump back
-	cd "${PresentDir}"
-	echo "${gitHandle}  : ${score}" >> "${reportsFile}"
-	
 done < "$namesfile"
 
 
