@@ -20,4 +20,4 @@ Fork this repository and contribute back using pull requests to the master branc
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under GNU General Public License.
